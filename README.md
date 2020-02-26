@@ -14,4 +14,4 @@ https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/abo
 
 ![](media/autocomplete.gif)
 
-### The script creates a 'command.sfdx' file in your home directory each time a powershell session is started. This file contains all the sfdx commands. It is created in the background to avoid blocking the user. So, you might experience a slight delay in autocomplete to start working the very first time
+<sup><sub>The script creates a 'command.sfdx' file in your home directory each time a powershell session is started. This file contains all the sfdx commands. It is created in the background to avoid blocking the user. So, you might experience a slight delay in autocomplete to start working the very first time</sup></sub>
