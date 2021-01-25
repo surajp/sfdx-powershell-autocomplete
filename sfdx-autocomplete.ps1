@@ -1,38 +1,48 @@
 New-Variable -Name sfdxCommands -Scope Script -Force
+New-Variable -Name sfdxCommandsFile -Scope Global -Force
+
+$global:sfdxCommandsFile = "$HOME/.sfdxcommands.json"
 
 <# The below script is executed in the background when a new ps session starts to pull all sfdx commands into a variable #>
 $sfdxCommandsFileCreateBlock = {
-	return sfdx commands --json | ConvertFrom-Json
+    Param($sfdxCommandsFile)
+    $tempCommandsFile = "$HOME/.sfdxcommandsinit.json"
+    sfdx commands --json | Out-File -FilePath $tempCommandsFile
+    Move-Item -Path $tempCommandsFile -Destination $sfdxCommandsFile
+    return Get-Content $sfdxCommandsFile | ConvertFrom-Json
 }
 
 <# executes the above script in the background so user is not waiting for the shell to start #>
-$sfdxCommandsFileCreateJob = Start-Job -ScriptBlock $sfdxCommandsFileCreateBlock
+$sfdxCommandsFileCreateJob = Start-Job -ScriptBlock $sfdxCommandsFileCreateBlock -argumentlist $global:sfdxCommandsFile
 
 <# script block for autocomplete. looks up matching commands from the file created above #>
 $scriptBlock = {
     param($wordToComplete, $commandAst, $cursorPosition)
 
-    if (!$script:sfdxCommands)
-    {
-        $script:sfdxCommands = Receive-Job -Wait -Job $sfdxCommandsFileCreateJob
-        Remove-Job $sfdxCommandsFileCreateJob
+    if (!$script:sfdxCommands) {
+        if (Test-Path $global:sfdxCommandsFile -PathType Leaf) {
+            $script:sfdxCommands = Get-Content $global:sfdxCommandsFile | ConvertFrom-Json
+        }
+        else {
+            $script:sfdxCommands = Receive-Job -Wait -Job $sfdxCommandsFileCreateJob
+        }
     }
 
-    if ($commandAst.CommandElements.Count -eq 1) <# List all commands #>
-    {
+    if ($commandAst.CommandElements.Count -eq 1) {
+        <# List all commands #>
         $script:sfdxCommands | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_.id, $_.id, 'Method', $_.description)
         }
     }
-    elseif ($commandAst.CommandElements.Count -eq 2 -and $wordToComplete -ne "") <# Completing a command #>
-    {
+    elseif ($commandAst.CommandElements.Count -eq 2 -and $wordToComplete -ne "") {
+        <# Completing a command #>
         $commandPattern = "^(force:)?" + $commandAst.CommandElements[1].Value + ".+" <# Complete if force: is not specified too #>
         $script:sfdxCommands | Where-Object id -match $commandPattern | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_.id, $_.id, 'Method', $_.description)
         }
     }
-    elseif ($commandAst.CommandElements.Count -gt 2) <# Completing a parameter #>
-    {
+    elseif ($commandAst.CommandElements.Count -gt 2) {
+        <# Completing a parameter #>
         $parameterToMatch = $commandAst.CommandElements[-1].ToString().TrimStart("-") + "*";
         
         ($script:sfdxCommands | Where-Object id -eq $commandAst.CommandElements[1].Value).flags.PsObject.Properties | Where-Object Name -like $parameterToMatch | ForEach-Object {
