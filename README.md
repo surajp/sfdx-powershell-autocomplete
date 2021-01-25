@@ -9,11 +9,13 @@
 - sfdx (the `npm` version installed using `npm i -g sfdx-cli`)
 - powershell (regular or powershell core)
 
-### Copy this script file (sfdx-autocomplete.ps1) to any directory on your machine. Add a reference to the script in your profile.ps1. Refer to the link below for instructions on how to create your custom powershell profile
+### Installation
+
+Copy this script file ([sfdx-autocomplete.ps1](./sfdx-autocomplete.ps1)) to any directory on your machine. Add a reference to the script in your Powershell User Profile file. Refer to the link below for instructions on how to set up your Powershell Profile.
 
 https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7
 
-### How to use
+### Usage
 
 - Type in 'sfdx' followed by any portion of the command you're looking for. For eg: Type in `sfdx` followed by a space and `lightning` to see all `force:lightning` commands, or `test` to see all commands associated with running tests.
 - After you type in a command, add double hyphens (`--`) followed by `<TAB><TAB>` to see the list of flags associated with the command, that you can then tab through.
