@@ -6,7 +6,7 @@
 
 ### Requirements
 
-- sfdx
+- sfdx (the `npm` version installed using `npm i -g sfdx-cli`)
 - powershell (regular or powershell core)
 
 ### Copy this script file (sfdx-autocomplete.ps1) to any directory on your machine. Add a reference to the script in your profile.ps1. Refer to the link below for instructions on how to create your custom powershell profile
