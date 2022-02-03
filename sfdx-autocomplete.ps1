@@ -8,7 +8,7 @@ $sfdxCommandsFileCreateBlock = {
     Param($sfdxCommandsFile)
     $tempCommandsFile = "$HOME/.sfdxcommandsinit.json"
     sfdx commands --json | Out-File -FilePath $tempCommandsFile
-    Move-Item -Path $tempCommandsFile -Destination $sfdxCommandsFile
+    Move-Item -Path $tempCommandsFile -Destination $sfdxCommandsFile -Force
     return Get-Content $sfdxCommandsFile | ConvertFrom-Json
 }
 
