@@ -42,11 +42,20 @@ $scriptBlock = {
         }
     }
     elseif ($commandAst.CommandElements.Count -gt 2) {
-        <# Completing a parameter #>
+                <# Completing a parameter #>
         $parameterToMatch = $commandAst.CommandElements[-1].ToString().TrimStart("-") + "*";
         
-        ($script:sfdxCommands | Where-Object id -eq $commandAst.CommandElements[1].Value).flags.PsObject.Properties | Where-Object Name -like $parameterToMatch | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new("--" + $_.Value.name, $_.Value.name, 'ParameterName', $_.Value.description)
+        # We now have commands separated by spaces instead of colons. Need the loop to figure out where the command ends and the parameters begin
+        [System.Collections.ArrayList]$commandParts = @() 
+        for($i =1; $i -lt ($commandAst.CommandElements.Count-1);$i++) {
+            if ($commandAst.CommandElements[$i].Value -clike "-*") {
+                break
+            }
+            $commandParts.Add($commandAst.CommandElements[$i].Value) > $null
+        }
+        $commandToMatch = $commandParts -join " "
+        ($script:sfdxCommands | Where-Object id -eq $commandToMatch).flags.PsObject.Properties | Where-Object Name -like $parameterToMatch | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new("--" + $_.Value.name, $_.Value.name, 'ParameterName', $_.Value.description??'No description available')
         }
     }
 }
