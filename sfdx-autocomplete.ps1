@@ -31,14 +31,14 @@ $scriptBlock = {
     if ($commandAst.CommandElements.Count -eq 1) {
         <# List all commands #>
         $script:sfdxCommands | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_.id, $_.id, 'Method', $_.description)
+            [System.Management.Automation.CompletionResult]::new($_.id, $_.id, 'Method', $_.description??'No description available')
         }
     }
     elseif ($commandAst.CommandElements.Count -eq 2 -and $wordToComplete -ne "") {
         <# Completing a command #>
         $commandPattern = ".*" + $commandAst.CommandElements[1].Value + ".*" <# Complete if force: is not specified too #>
         $script:sfdxCommands | Where-Object id -match $commandPattern | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_.id, $_.id, 'Method', $_.description)
+            [System.Management.Automation.CompletionResult]::new($_.id, $_.id, 'Method', $_.description??'No description available')
         }
     }
     elseif ($commandAst.CommandElements.Count -gt 2) {
